@@ -1,4 +1,15 @@
-# This folder
+# switch-theme
+
+Tool for switching themes in vim, tmux, zsh, bat, vsCode, terminals (gnome, mintty, Terminal.app),
+and whatever else I figure out.
+
+## Installation
+
+switch-theme is a bash script, so putting it anywhere in your $PATH is all you really need to do!
+
+You can also do `brew install flare576/scripts/switch-theme`
+
+## Themes
 
 Each sub-folder in this folder represents a _theme_. A theme consists of:
 

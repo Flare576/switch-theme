@@ -1,15 +1,29 @@
-# This script sets environment variables that it expects other apps to understand/respect and
-# Therefore doesn't work in a vacuum. Things that need to happen include:
-# ".doNotCommit.theme" needs to be sourced
-# .vimrc needs to include the UpdateTheme function, which also knows where the theme files are
-#  - could be helped if env_var held the full path instead of just the name/filename
-# omz also needs to be made aware of the new file location (during setup)
-# actually, could just setup symlink during this script if it's not already there
-# tmux should also just be setup with full path in envar
-# bat should NOT have full path; we don't currently add any new themes, just reference ones it ships with
+#/bin/sh
+# TODO: Need to make vim plugin for that functionality
+version=1.0.0
+usage="$(basename "$0") [h]
+Calling this script will return it's absolute path. The intent is to put an entry like this in your profile:
 
+source \"\$(switchTheme)\"
+
+which will then allow you to call
+
+st <theme_alias>
+
+to switch themes."
+
+while getopts ':h' option; do
+  case "$option" in
+    h) echo "$usage"
+      exit
+      ;;
+  esac
+done
+shift $((OPTIND -1))
+
+# Most of the work is done when a user wants to change themes
 function st() {
-  app_root="$(dirname "$(switchTheme.sh)")"
+  app_root="$(dirname "$(switch-theme.sh)")"
   themes="$app_root/themes"
   hasRun="false"
   # Each theme can have a number of "aliases", e.g. "dark", "night", "soldark"
@@ -88,11 +102,12 @@ EOF
   done
 }
 
+# convenience method
 function yaml() {
   python3 -c "import yaml;print(yaml.safe_load(open('$1'))$2)"
 }
 
-# ZSH/OMZ "switchTheme" functionality to watch for changes to theme settings
+# ZSH/OMZ functionality to watch for changes to theme settings
 function zsh_theme_refresh() {
   [ -z "$THEME_CONFIG" ] && THEME_CONFIG="$HOME/.config/theme"
   [ -f "$THEME_CONFIG" ] && source "$THEME_CONFIG"
@@ -100,9 +115,9 @@ function zsh_theme_refresh() {
 }
 precmd_functions=(${precmd_functions[@]} zsh_theme_refresh)
 
-# When sourced
 # see https://stackoverflow.com/a/28776166
 (return 0 2>/dev/null) && sourced=1 || sourced=0
+
 if [ $sourced -eq 1 ]; then
   [ -z "$THEME_CONFIG" ] && THEME_CONFIG="$HOME/.config/theme"
   [ -e "$THEME_CONFIG" ] || st dark

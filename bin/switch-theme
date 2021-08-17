@@ -1,6 +1,6 @@
 #/bin/sh
 # TODO: Need to make vim plugin for that functionality
-version=1.0.0
+version=1.0.1
 usage="$(basename "$0") [h]
 Calling this script will return it's absolute path. The intent is to put an entry like this in your profile:
 
@@ -23,7 +23,7 @@ shift $((OPTIND -1))
 
 # Most of the work is done when a user wants to change themes
 function st() {
-  app_root="$(dirname "$(switch-theme.sh)")"
+  app_root="$(dirname "$(switch-theme)")"
   themes="$app_root/themes"
   hasRun="false"
   # Each theme can have a number of "aliases", e.g. "dark", "night", "soldark"

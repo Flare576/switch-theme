@@ -1,10 +1,10 @@
 #/bin/sh
 # TODO: Need to make vim plugin for that functionality
-version=1.0.2
+version=1.0.3
 usage="$(basename "$0") [h]
 Calling this script will return it's absolute path. The intent is to put an entry like this in your profile:
 
-source \"\$(switchTheme)\"
+source \"\$(switch-theme)\"
 
 which will then allow you to call
 
@@ -21,9 +21,11 @@ while getopts ':h' option; do
 done
 shift $((OPTIND -1))
 
+SCRIPTPATH="$(realpath "$0")"
+
 # Most of the work is done when a user wants to change themes
 function st() {
-  app_root="$(dirname "$(switch-theme)")"
+  app_root="$(dirname "$SCRIPTPATH")"
   themes="$app_root/themes"
   hasRun="false"
   # Each theme can have a number of "aliases", e.g. "dark", "night", "soldark"
@@ -123,5 +125,5 @@ if [ $sourced -eq 1 ]; then
   [ -e "$THEME_CONFIG" ] || st dark
   source "$THEME_CONFIG"
 else
-  printf "$0"
+  printf "$SCRIPTPATH"
 fi

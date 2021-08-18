@@ -1,6 +1,6 @@
 #/bin/sh
 # TODO: Need to make vim plugin for that functionality
-version=1.0.1
+version=1.0.2
 usage="$(basename "$0") [h]
 Calling this script will return it's absolute path. The intent is to put an entry like this in your profile:
 

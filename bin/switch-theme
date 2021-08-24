@@ -1,6 +1,6 @@
 #/bin/sh
 # TODO: Need to make vim plugin for that functionality
-version=1.0.3
+version=1.1.0
 usage="$(basename "$0") [h]
 Calling this script will return it's absolute path. The intent is to put an entry like this in your profile:
 
@@ -12,10 +12,12 @@ st <theme_alias>
 
 to switch themes."
 
-while getopts ':h' option; do
+while getopts ':sh' option; do
   case "$option" in
     h) echo "$usage"
       exit
+      ;;
+    s) do_setup="true"
       ;;
   esac
 done
@@ -32,7 +34,7 @@ function st() {
   # Find matching alias (and warn if there's more than one)
   for config in "$themes"/**/config.yml; do
     [ -e "$config" ] || continue
-    checkFor=( $(yaml "$config" "['alias']" | sed "s/[][',]//g") )
+    checkFor=( $(st_yaml "$config" "['alias']" | sed "s/[][',]//g") )
     # padding with spaces is a nice trick to guard against partial matches
     [[ " ${checkFor[@]} " =~ " $1 " ]] || continue
     if [ $hasRun = "true" ] ; then
@@ -43,11 +45,11 @@ function st() {
     theme_folder="$(dirname "$config")"
     [ -z "$THEME_CONFIG" ] && THEME_CONFIG="$HOME/.config/theme"
     cat << EOF > $THEME_CONFIG
-export ST_VIM_THEME="$theme_folder/$(yaml "$config" "['vim']")"
-export ST_TMUX_THEME="$theme_folder/$(yaml "$config" "['tmux']")"
-source "$theme_folder/$(yaml "$config" "['zsh']")"
+export ST_VIM_THEME="$theme_folder/$(st_yaml "$config" "['vim']")"
+export ST_TMUX_THEME="$theme_folder/$(st_yaml "$config" "['tmux']")"
+source "$theme_folder/$(st_yaml "$config" "['zsh']")"
 # bat doesn't use full paths; it ships with its themes
-export BAT_THEME="$(yaml "$config" "['bat']")"
+export BAT_THEME="$(st_yaml "$config" "['bat']")"
 EOF
     source "$THEME_CONFIG"
 
@@ -58,14 +60,14 @@ EOF
     # cheat makes it pretty easy, so why not
     # because it edits a source-controlled file each time;TODO: see if we can avoid that
     if command -v cheat &> /dev/null ; then
-      cheat_theme="$(yaml "$config" "['cheat']")"
+      cheat_theme="$(st_yaml "$config" "['cheat']")"
       filename="$HOME/cheat/conf.yml"
       sed -i "" -e "s/^style:.*/style: $cheat_theme/" "$filename"
     fi
 
     # VSCode makes it pretty easy, so why not
     if command -v Code &> /dev/null ; then
-      code_theme="$(yaml "$config" "['vscode']")"
+      code_theme="$(st_yaml "$config" "['vscode']")"
       filename="$HOME/Library/Application Support/Code/User/settings.json"
       sed -i "" -e "s/\"workbench.colorTheme\":.*/\"workbench.colorTheme\": \"$code_theme\"/" "$filename"
     fi
@@ -74,7 +76,7 @@ EOF
     if command -v mintheme &> /dev/null ; then # WSL
       # https://github.com/mintty/utils/pull/2/files
       # patch submitted to mintheme; remove check when accepted (or declined)
-      minttyTheme="$(yaml "$config" "['mintty']")"
+      minttyTheme="$(st_yaml "$config" "['mintty']")"
       theme=$(mintheme --save $name/$minttyTheme | sed \
         -e '2!d' \
         -e 's/saved.\+''//')
@@ -84,12 +86,8 @@ EOF
         echo $theme
       fi
     elif command -v defaults &> /dev/null ; then # OSX
-      title="$(yaml "$config" "['terminal']")"
+      title="$(st_yaml "$config" "['terminal']")"
       # TODO: should be a way to check if this value is already there...
-      # THIS WON'T WORK: editing the plist requires a restart
-      theme="${theme_folder}/${title}.terminal"
-      bare=$(sed -n '/<dict>/,/<\/dict>/p' "$theme")
-      defaults write com.apple.Terminal "Window Settings" -dict-add "$title" "$bare"
       defaults write com.apple.Terminal "Startup Window Settings" "$title"    # Set new profile to startup
       defaults write com.apple.Terminal "Default Window Settings" "$title"    # Set new profile to default
       osascript "$app_root/themeOpenTerminals.scpt" "$title" # Update active/existing windows
@@ -97,7 +95,7 @@ EOF
       # copy/paste desired theme over "current" theme (which should be "Flare")
       symId=":6d940353-9091-4d32-b491-95a661527d08/"
       basePath="/org/gnome/terminal/legacy/profiles:"
-      gnomeId="$(yaml "$config" "['gnome']")"
+      gnomeId="$(st_yaml "$config" "['gnome']")"
       updateTo=$(dconf dump "$basePath/$gnomeId" | sed -e "s/visible-name='.*'/visible-name='Flare'/")
       echo "$updateTo" | dconf load $basePath/$symId
     fi # else we're probably not running a terminal emulator on this machine
@@ -105,17 +103,17 @@ EOF
 }
 
 # convenience method
-function yaml() {
+function st_yaml() {
   python3 -c "import yaml;print(yaml.safe_load(open('$1'))$2)"
 }
 
 # ZSH/OMZ functionality to watch for changes to theme settings
-function zsh_theme_refresh() {
+function st_zsh_theme_refresh() {
   [ -z "$THEME_CONFIG" ] && THEME_CONFIG="$HOME/.config/theme"
   [ -f "$THEME_CONFIG" ] && source "$THEME_CONFIG"
   [ -f "$ST_ZSH_THEME" ] && source "$ST_ZSH_THEME"
 }
-precmd_functions=(${precmd_functions[@]} zsh_theme_refresh)
+precmd_functions=(${precmd_functions[@]} st_zsh_theme_refresh)
 
 # see https://stackoverflow.com/a/28776166
 (return 0 2>/dev/null) && sourced=1 || sourced=0
@@ -125,5 +123,18 @@ if [ $sourced -eq 1 ]; then
   [ -e "$THEME_CONFIG" ] || st dark
   source "$THEME_CONFIG"
 else
-  printf "$SCRIPTPATH"
+  # Executing as a command
+  if [ "$do_setup" == "true" ]; then
+    # Each terminal emulator setup file should check for itself
+    bash setupGnome.sh
+    bash setupTerminalApp.sh
+    bash setupTerminalApp.sh
+
+    # Wire up vim plugin for <leader>t
+    ln -sf "$SCRIPTPATH/vim-switch-theme" "/Users/flare576/.vim/pack/plugins/start/vim-switch-themes"
+  else
+    printf "$SCRIPTPATH"
+  fi
 fi
+
+# vim: ft=bash

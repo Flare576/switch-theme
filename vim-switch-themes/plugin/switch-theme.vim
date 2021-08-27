@@ -9,7 +9,10 @@ function! UpdateTheme() abort
   let g:st_theme = l:cur_theme
 endfunction
 
-call UpdateTheme()
+augroup theme_switcher_load
+  au!
+  autocmd VimEnter * call UpdateTheme()
+augroup END
 nnoremap <leader>t :let g:st_theme = '' <bar> call UpdateTheme()<CR>
 " Totally kills performance if I recall correctly
 "augroup theme_switcher

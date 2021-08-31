@@ -1,4 +1,4 @@
-#/bin/sh
+#!/bin/sh
 
 # If we find `defaults`, we can assume we're on OSX
 if ! command -v defaults &> /dev/null ; then # OSX

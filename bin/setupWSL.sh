@@ -1,4 +1,4 @@
-#/bin/sh
+#!/bin/sh
 # Mintty apparently works by copying the theme files into "$(wslpath $APPDATA)/mintty/themes"
 # If I recall, this is because the themes need to be outside of the unix filespace so Windows can reach them;
 # I'm not working on WSL much right now, so just keep that pattern

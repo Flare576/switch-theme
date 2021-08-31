@@ -1,6 +1,6 @@
 #/bin/sh
 # TODO: Need to make vim plugin for that functionality
-version=1.1.1
+version=1.1.2
 usage="$(basename "$0") [h]
 Calling this script will return it's absolute path. The intent is to put an entry like this in your profile:
 
@@ -28,7 +28,7 @@ SCRIPTPATH="$(realpath "$0")"
 # Most of the work is done when a user wants to change themes
 function st() {
   app_root="$(dirname "$SCRIPTPATH")"
-  themes="$app_root/themes"
+  themes="$app_root/../themes"
   hasRun="false"
   # Each theme can have a number of "aliases", e.g. "dark", "night", "soldark"
   # Find matching alias (and warn if there's more than one)

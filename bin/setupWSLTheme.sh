@@ -3,7 +3,7 @@
 # If I recall, this is because the themes need to be outside of the unix filespace so Windows can reach them;
 # I'm not working on WSL much right now, so just keep that pattern
 if ! command -v mintheme &> /dev/null ; then # WSL
-  return
+  exit
 fi
 
 mintty_home="$(wslpath $APPDATA)/mintty"

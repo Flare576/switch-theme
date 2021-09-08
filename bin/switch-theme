@@ -1,6 +1,5 @@
 #!/bin/sh
-# TODO: Need to make vim plugin for that functionality
-version=1.1.3
+version=1.1.4
 usage="$(basename "$0") [h]
 Calling this script will return it's absolute path. The intent is to put an entry like this in your profile:
 
@@ -23,12 +22,13 @@ while getopts ':sh' option; do
 done
 shift $((OPTIND -1))
 
-SCRIPTPATH="$(realpath "$0")"
+SCRIPTPATH="$0"
+INSTALLED="${SCRIPTPATH%/*/*}"
 
 # Most of the work is done when a user wants to change themes
 function st() {
-  app_root="$(dirname "$SCRIPTPATH")"
-  themes="$app_root/../themes"
+  app_root="$INSTALLED/bin"
+  themes="$INSTALLED/lib/themes/"
   hasRun="false"
   # Each theme can have a number of "aliases", e.g. "dark", "night", "soldark"
   # Find matching alias (and warn if there's more than one)
@@ -90,7 +90,7 @@ EOF
       # TODO: should be a way to check if this value is already there...
       defaults write com.apple.Terminal "Startup Window Settings" "$title"    # Set new profile to startup
       defaults write com.apple.Terminal "Default Window Settings" "$title"    # Set new profile to default
-      osascript "$app_root/themeOpenTerminals.scpt" "$title" # Update active/existing windows
+      osascript "$INSTALLED/bin/themeOpenTerminals.scpt" "$title" # Update active/existing windows
     elif command -v dconf &> /dev/null ; then  # Chromebook
       # copy/paste desired theme over "current" theme (which should be "Flare")
       symId=":6d940353-9091-4d32-b491-95a661527d08/"
@@ -126,12 +126,13 @@ else
   # Executing as a command
   if [ "$do_setup" == "true" ]; then
     # Each terminal emulator setup file should check for itself
-    bash setupGnome.sh
-    bash setupTerminalApp.sh
-    bash setupTerminalApp.sh
+    bash "$INSTALLED/bin/setupGnomeTheme.sh"
+    bash "$INSTALLED/bin/setupWSLTheme.sh"
+    bash "$INSTALLED/bin/setupTerminalAppTheme.sh"
 
     # Wire up vim plugin for <leader>t
-    ln -sf "$SCRIPTPATH/vim-switch-theme" "/Users/flare576/.vim/pack/plugins/start/vim-switch-themes"
+    rm "$HOME/.vim/pack/plugins/start/vim-switch-themes" &> /dev/null
+    ln -sf "$INSTALLED/lib/vim-switch-themes" "$HOME/.vim/pack/plugins/start/vim-switch-themes"
   else
     printf "$SCRIPTPATH"
   fi

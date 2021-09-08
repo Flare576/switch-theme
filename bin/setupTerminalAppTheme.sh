@@ -2,7 +2,7 @@
 
 # If we find `defaults`, we can assume we're on OSX
 if ! command -v defaults &> /dev/null ; then # OSX
-  return
+  exit
 fi
 
 for theme in $SCRIPTPATH/themes/**/*.terminal; do

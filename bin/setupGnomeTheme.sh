@@ -8,7 +8,7 @@
 # to the last theme loaded
 
 if ! command -v dconf &> /dev/null ; then  # Chromebook
-  return
+  exit
 fi
 
 profilesPath="/org/gnome/terminal/legacy/profiles:/"

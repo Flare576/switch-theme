@@ -18,9 +18,9 @@ Each sub-folder in this folder represents a _theme_. A theme consists of:
   * `.minttyrc` for mintty/wsltty (WSL)
   * `.gnome` for gnome (Chromebook)
 * Main applications
-  * *_tmux
-  * *_vim
-  * *_zsh
+  * \*\_tmux
+  * \*\_vim
+  * \*\_zsh
 * config file
 
 In addition to the core apps, `bat` can also be customized as long as you've loaded the theme to its
@@ -72,13 +72,13 @@ names you have to work with.
 Then you step into your shell. I'll be talking about ZSH because that's what
 I've researched, but other shells may do a similar re-assigning to this.
 
-ZSH makes using colors easier* by replacing the escape codes with functions and
+ZSH makes using colors easier† by replacing the escape codes with functions and
 alternate keys: [ZSH Theme Cheat
 Sheet](https://jsfiddle.net/seport/shrovLgf/embedded/result/). It provides 8
 standardized names (black, red, green, yellow, blue, magenta, cyan, white) as
 well as number codes for the spectrum of 256 colors.
 
-> \*Once you understand how your terminal theme, escape codes, and ZSH's
+> †Once you understand how your terminal theme, escape codes, and ZSH's
 > mappings work, it actually does make things easier... until then, it was just
 > another layer of confusion for me.
 
@@ -128,7 +128,7 @@ PROMPT='%{${FG[001]}%}>%f '
 [tmux](https://github.com/tmux/tmux/wiki), like ZSH, is beholden to the
 terminal emulator in which it's running to define the colors it can use. Unlike
 ZSH, however, it provides sane, [human-readable
-values](https://man7.org/linux/man-pages/man1/tmux.1.html#STYLES)**. Running any
+values](https://man7.org/linux/man-pages/man1/tmux.1.html#STYLES)††. Running any
 of the following from the tmux command line will cause the window listing to
 display red text on a green background (ew)
 
@@ -137,7 +137,7 @@ display red text on a green background (ew)
 :set-window-option -g window-status-current-style fg=brightred,bg=green
 :set-window-option -g window-status-current-style fg='#CC4D16',bg='#859900'
 ```
-> \*\*Human readable, but also British English... still an improvement!
+> ††Human readable, but also British English... still an improvement!
 
 ### VIM
 

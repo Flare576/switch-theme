@@ -1,11 +1,17 @@
-#!/bin/sh
+#!/bin/bash
+THEMES="$1"
+
+# convenience method
+function st_yaml() {
+  python3 -c "import yaml;print(yaml.safe_load(open('$1'))$2)"
+}
 
 # If we find `defaults`, we can assume we're on OSX
 if ! command -v defaults &> /dev/null ; then # OSX
   exit
 fi
 
-for theme in $SCRIPTPATH/themes/**/*.terminal; do
+for theme in $THEMES/themes/**/*.terminal; do
   config="$(dirname "$theme")/config.yml"
   [ -e "$config" ] || continue
   themeName=$(st_yaml "$config" "['terminal']")

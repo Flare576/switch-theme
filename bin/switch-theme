@@ -1,5 +1,5 @@
-#!/bin/sh
-version=1.1.4
+#!/bin/bash
+version=1.1.5
 usage="$(basename "$0") [h]
 Calling this script will return it's absolute path. The intent is to put an entry like this in your profile:
 
@@ -11,12 +11,15 @@ st <theme_alias>
 
 to switch themes."
 
-while getopts ':sh' option; do
+while getopts ':hsv' option; do
   case "$option" in
     h) echo "$usage"
       exit
       ;;
     s) do_setup="true"
+      ;;
+    v) echo $version
+      exit
       ;;
   esac
 done
@@ -24,15 +27,15 @@ shift $((OPTIND -1))
 
 SCRIPTPATH="$0"
 INSTALLED="${SCRIPTPATH%/*/*}"
+THEMES="$INSTALLED/lib/themes"
 
 # Most of the work is done when a user wants to change themes
 function st() {
   app_root="$INSTALLED/bin"
-  themes="$INSTALLED/lib/themes/"
   hasRun="false"
   # Each theme can have a number of "aliases", e.g. "dark", "night", "soldark"
   # Find matching alias (and warn if there's more than one)
-  for config in "$themes"/**/config.yml; do
+  for config in "$THEMES"/**/config.yml; do
     [ -e "$config" ] || continue
     checkFor=( $(st_yaml "$config" "['alias']" | sed "s/[][',]//g") )
     # padding with spaces is a nice trick to guard against partial matches
@@ -126,9 +129,9 @@ else
   # Executing as a command
   if [ "$do_setup" == "true" ]; then
     # Each terminal emulator setup file should check for itself
-    bash "$INSTALLED/bin/setupGnomeTheme.sh"
-    bash "$INSTALLED/bin/setupWSLTheme.sh"
-    bash "$INSTALLED/bin/setupTerminalAppTheme.sh"
+    $INSTALLED/bin/setupGnomeTheme.sh "$THEMES"
+    $INSTALLED/bin/setupWSLTheme.sh "$THEMES"
+    $INSTALLED/bin/setupTerminalAppTheme.sh "$THEMES"
 
     # Wire up vim plugin for <leader>t
     rm "$HOME/.vim/pack/plugins/start/vim-switch-themes" &> /dev/null

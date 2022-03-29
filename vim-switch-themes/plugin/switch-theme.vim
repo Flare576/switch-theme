@@ -4,19 +4,17 @@ function! UpdateTheme() abort
   if l:cur_theme != "" && (!exists('g:st_theme') || g:st_theme != l:cur_theme)
     execute "source " . l:cur_theme
     " take BG from term/tmux
-    hi Normal guibg=NONE ctermbg=NONE
+    highlight Normal guibg=NONE ctermbg=NONE
+    highlight ExtraWhitespace ctermbg=red ctermfg=white guibg=red
   endif
   let g:st_theme = l:cur_theme
 endfunction
 
-augroup theme_switcher_load
+nnoremap <leader>t :let g:st_theme = '' <bar> call UpdateTheme()<CR>
+
+augroup theme_switcher
   au!
   autocmd VimEnter * call UpdateTheme()
+  autocmd InsertEnter * call UpdateTheme()
+  autocmd InsertLeave * call UpdateTheme()
 augroup END
-nnoremap <leader>t :let g:st_theme = '' <bar> call UpdateTheme()<CR>
-" Totally kills performance if I recall correctly
-"augroup theme_switcher
-"  au!
-"  autocmd InsertEnter * call UpdateTheme()
-"  autocmd InsertLeave * call UpdateTheme()
-"augroup END

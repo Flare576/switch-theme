@@ -1,5 +1,5 @@
 #!/bin/bash
-version=1.1.5
+version=1.1.6
 usage="$(basename "$0") [h]
 Calling this script will return it's absolute path. The intent is to put an entry like this in your profile:
 

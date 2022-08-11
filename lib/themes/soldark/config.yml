@@ -9,7 +9,4 @@ bat: Solarized (dark)
 cheat: solarized-dark
 vscode: "Solarized Dark"
 firefox: "{24ab4f91-e91c-4c5b-868b-1c38c731695f}"
-alias:
-  - dark
-  - soldark
-  - night
+alias: dark,soldark,night

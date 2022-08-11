@@ -7,6 +7,12 @@
 # Preference UI's list, and sets the default key to use "Flare". Flare is set
 # to the last theme loaded
 
+# convenience method
+function st_yaml() {
+  line=$(grep $2 $1)
+  echo ${line#$2: }
+}
+
 if ! command -v dconf &> /dev/null ; then  # Chromebook
   exit
 fi
@@ -24,8 +30,8 @@ themeFiles="$HOME/dotfiles/themes"/**/*.gnome
 for theme in $themeFiles; do
   [ -e "$theme" ] || continue
   config=$(echo $theme | sed 's/\(.*\)\/.*.gnome/\1\/config')
-  themeName=$(yaml "$config" "['name']")
-  id=$(yaml "$config" "['gnome']")
+  themeName=$(st_yaml "$config" "name")
+  id=$(st_yaml "$config" "gnome")
 
   echo "Importing $themeName Gnome Theme"
   dconf load "$profilesPath" < "$theme"

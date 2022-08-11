@@ -1,5 +1,5 @@
 #!/bin/bash
-version=1.1.6
+version=1.2.0
 usage="$(basename "$0") [h]
 Calling this script will return it's absolute path. The intent is to put an entry like this in your profile:
 
@@ -37,9 +37,9 @@ function st() {
   # Find matching alias (and warn if there's more than one)
   for config in "$THEMES"/**/config.yml; do
     [ -e "$config" ] || continue
-    checkFor=( $(st_yaml "$config" "['alias']" | sed "s/[][',]//g") )
-    # padding with spaces is a nice trick to guard against partial matches
-    [[ " ${checkFor[@]} " =~ " $1 " ]] || continue
+    checkFor=( ",$(st_yaml "$config" "alias")," )
+    # padding with commas is a nice trick to guard against partial matches
+    [[ " ${checkFor[@]} " =~ ",$1," ]] || continue
     if [ $hasRun = "true" ] ; then
       echo "There as a duplicate alias; using first found"
       return 1
@@ -48,11 +48,11 @@ function st() {
     theme_folder="$(dirname "$config")"
     [ -z "$THEME_CONFIG" ] && THEME_CONFIG="$HOME/.config/theme"
     cat << EOF > $THEME_CONFIG
-export ST_VIM_THEME="$theme_folder/$(st_yaml "$config" "['vim']")"
-export ST_TMUX_THEME="$theme_folder/$(st_yaml "$config" "['tmux']")"
-source "$theme_folder/$(st_yaml "$config" "['zsh']")"
+export ST_VIM_THEME="$theme_folder/$(st_yaml "$config" "vim")"
+export ST_TMUX_THEME="$theme_folder/$(st_yaml "$config" "tmux")"
+source "$theme_folder/$(st_yaml "$config" "zsh")"
 # bat doesn't use full paths; it ships with its themes
-export BAT_THEME="$(st_yaml "$config" "['bat']")"
+export BAT_THEME="$(st_yaml "$config" "bat")"
 EOF
     source "$THEME_CONFIG"
 
@@ -63,14 +63,14 @@ EOF
     # cheat makes it pretty easy, so why not
     # because it edits a source-controlled file each time;TODO: see if we can avoid that
     if command -v cheat &> /dev/null ; then
-      cheat_theme="$(st_yaml "$config" "['cheat']")"
+      cheat_theme="$(st_yaml "$config" "cheat")"
       filename="$HOME/cheat/conf.yml"
       sed -i "" -e "s/^style:.*/style: $cheat_theme/" "$filename" &> /dev/null
     fi
 
     # VSCode makes it pretty easy, so why not
     if command -v Code &> /dev/null ; then
-      code_theme="$(st_yaml "$config" "['vscode']")"
+      code_theme="$(st_yaml "$config" "vscode")"
       filename="$HOME/Library/Application Support/Code/User/settings.json"
       sed -i "" -e "s/\"workbench.colorTheme\":.*/\"workbench.colorTheme\": \"$code_theme\"/" "$filename" &> /dev/null
     fi
@@ -79,7 +79,7 @@ EOF
     if command -v mintheme &> /dev/null ; then # WSL
       # https://github.com/mintty/utils/pull/2/files
       # patch submitted to mintheme; remove check when accepted (or declined)
-      minttyTheme="$(st_yaml "$config" "['mintty']")"
+      minttyTheme="$(st_yaml "$config" "mintty")"
       theme=$(mintheme --save $name/$minttyTheme | sed \
         -e '2!d' \
         -e 's/saved.\+''//')
@@ -89,7 +89,7 @@ EOF
         echo $theme
       fi
     elif command -v defaults &> /dev/null ; then # OSX
-      title="$(st_yaml "$config" "['terminal']")"
+      title="$(st_yaml "$config" "terminal")"
       # TODO: should be a way to check if this value is already there...
       defaults write com.apple.Terminal "Startup Window Settings" "$title"    # Set new profile to startup
       defaults write com.apple.Terminal "Default Window Settings" "$title"    # Set new profile to default
@@ -98,7 +98,7 @@ EOF
       # copy/paste desired theme over "current" theme (which should be "Flare")
       symId=":6d940353-9091-4d32-b491-95a661527d08/"
       basePath="/org/gnome/terminal/legacy/profiles:"
-      gnomeId="$(st_yaml "$config" "['gnome']")"
+      gnomeId="$(st_yaml "$config" "gnome")"
       updateTo=$(dconf dump "$basePath/$gnomeId" | sed -e "s/visible-name='.*'/visible-name='Flare'/")
       echo "$updateTo" | dconf load $basePath/$symId
     fi # else we're probably not running a terminal emulator on this machine
@@ -107,7 +107,8 @@ EOF
 
 # convenience method
 function st_yaml() {
-  python3 -c "import yaml;print(yaml.safe_load(open('$1'))$2)"
+  line=$(grep $2 $1)
+  echo ${line#$2: }
 }
 
 # ZSH/OMZ functionality to watch for changes to theme settings

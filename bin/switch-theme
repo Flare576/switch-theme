@@ -1,5 +1,5 @@
 #!/bin/bash
-version=1.2.0
+version=1.3.0
 usage="$(basename "$0") [h]
 Calling this script will return it's absolute path. The intent is to put an entry like this in your profile:
 
@@ -74,6 +74,14 @@ EOF
       filename="$HOME/Library/Application Support/Code/User/settings.json"
       [ ! -f "$filename" ] && echo "{\n\t\"workbench.colorTheme\": \"$code_theme\"\n}" > "$filename"
       sed -i "" -e "s/\"workbench.colorTheme\":.*/\"workbench.colorTheme\": \"$code_theme\"/" "$filename" &> /dev/null
+    fi
+
+    # Azure Data Studio makes it pretty easy, so why not
+    if command -v azuredatastudio &> /dev/null ; then
+      ads_theme="$(st_yaml "$config" "azuredatastudio")"
+      filename="$HOME/Library/Application Support/azuredatastudio/User/settings.json"
+      [ ! -f "$filename" ] && echo "{\n\t\"workbench.colorTheme\": \"$ads_theme\"\n}" > "$filename"
+      sed -i "" -e "s/\"workbench.colorTheme\":.*/\"workbench.colorTheme\": \"$ads_theme\"/" "$filename" &> /dev/null
     fi
 
     # Terminal emulators for different machines I use

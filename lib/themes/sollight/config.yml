@@ -8,5 +8,6 @@ zsh: solarized-light.zsh-theme
 bat: Solarized (light)
 cheat: solarized-light
 firefox: "{71864fba-a0ac-47f5-a514-e5f3378b9c12}"
-vscode: "Solarized Light"
+vscode: Solarized Light
+azuredatastudio: Solarized Light
 alias: light,sollight,day

@@ -7,6 +7,7 @@ vim: solarized-dark_vim
 zsh: solarized-dark.zsh-theme
 bat: Solarized (dark)
 cheat: solarized-dark
-vscode: "Solarized Dark"
+vscode: Solarized Dark
+azuredatastudio: Solarized Dark
 firefox: "{24ab4f91-e91c-4c5b-868b-1c38c731695f}"
 alias: dark,soldark,night

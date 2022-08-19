@@ -72,6 +72,7 @@ EOF
     if command -v Code &> /dev/null ; then
       code_theme="$(st_yaml "$config" "vscode")"
       filename="$HOME/Library/Application Support/Code/User/settings.json"
+      [ ! -f "$filename" ] && echo "{\n\t\"workbench.colorTheme\": \"$code_theme\"\n}" > "$filename"
       sed -i "" -e "s/\"workbench.colorTheme\":.*/\"workbench.colorTheme\": \"$code_theme\"/" "$filename" &> /dev/null
     fi
 

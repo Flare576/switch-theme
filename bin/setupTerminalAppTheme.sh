@@ -12,7 +12,7 @@ if ! command -v defaults &> /dev/null ; then # OSX
   exit
 fi
 
-for theme in $THEMES/themes/**/*.terminal; do
+for theme in $THEMES/**/*.terminal; do
   config="$(dirname "$theme")/config.yml"
   [ -e "$config" ] || continue
   themeName=$(st_yaml "$config" "terminal")

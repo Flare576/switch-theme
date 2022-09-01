@@ -72,7 +72,7 @@ EOF
     if command -v Code &> /dev/null ; then
       code_theme="$(st_yaml "$config" "vscode")"
       filename="$HOME/Library/Application Support/Code/User/settings.json"
-      [ ! -f "$filename" ] && echo "{\n\t\"workbench.colorTheme\": \"$code_theme\"\n}" > "$filename"
+      [ ! -f "$filename" ] && mkdir -p "$(dirname "$filename")" && echo "{\n\t\"workbench.colorTheme\": \"$code_theme\"\n}" > "$filename"
       sed -i "" -e "s/\"workbench.colorTheme\":.*/\"workbench.colorTheme\": \"$code_theme\"/" "$filename" &> /dev/null
     fi
 
@@ -80,7 +80,7 @@ EOF
     if command -v azuredatastudio &> /dev/null ; then
       ads_theme="$(st_yaml "$config" "azuredatastudio")"
       filename="$HOME/Library/Application Support/azuredatastudio/User/settings.json"
-      [ ! -f "$filename" ] && echo "{\n\t\"workbench.colorTheme\": \"$ads_theme\"\n}" > "$filename"
+      [ ! -f "$filename" ] && mkdir -p $(dirname "$filename") && echo "{\n\t\"workbench.colorTheme\": \"$ads_theme\"\n}" > "$filename"
       sed -i "" -e "s/\"workbench.colorTheme\":.*/\"workbench.colorTheme\": \"$ads_theme\"/" "$filename" &> /dev/null
     fi
 

@@ -31,7 +31,6 @@ THEMES="$INSTALLED/lib/themes"
 
 # Most of the work is done when a user wants to change themes
 function st() {
-  app_root="$INSTALLED/bin"
   hasRun="false"
   # Each theme can have a number of "aliases", e.g. "dark", "night", "soldark"
   # Find matching alias (and warn if there's more than one)
@@ -104,7 +103,7 @@ EOF
       # TODO: should be a way to check if this value is already there...
       defaults write com.apple.Terminal "Startup Window Settings" "$title"    # Set new profile to startup
       defaults write com.apple.Terminal "Default Window Settings" "$title"    # Set new profile to default
-      osascript "$INSTALLED/bin/themeOpenTerminals.scpt" "$title" # Update active/existing windows
+      osascript "$INSTALLED/lib/scripts/themeOpenTerminals.scpt" "$title" # Update active/existing windows
     elif command -v dconf &> /dev/null ; then  # Chromebook
       # copy/paste desired theme over "current" theme (which should be "Flare")
       symId=":6d940353-9091-4d32-b491-95a661527d08/"
@@ -141,9 +140,9 @@ else
   # Executing as a command
   if [ "$do_setup" == "true" ]; then
     # Each terminal emulator setup file should check for itself
-    $INSTALLED/bin/setupGnomeTheme.sh "$THEMES"
-    $INSTALLED/bin/setupWSLTheme.sh "$THEMES"
-    $INSTALLED/bin/setupTerminalAppTheme.sh "$THEMES"
+    $INSTALLED/lib/scripts/setupGnomeTheme.sh "$THEMES"
+    $INSTALLED/lib/scripts/setupWSLTheme.sh "$THEMES"
+    $INSTALLED/lib/scripts/setupTerminalAppTheme.sh "$THEMES"
 
     # Wire up vim plugin for <leader>t
     rm "$HOME/.vim/pack/plugins/start/vim-switch-themes" &> /dev/null

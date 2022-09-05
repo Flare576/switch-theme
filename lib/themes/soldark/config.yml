@@ -1,5 +1,5 @@
 name: soldark
-gnome: ":6439a867-f018-4fce-a077-dd0cd98ef13c/"
+gnome: :6439a867-f018-4fce-a077-dd0cd98ef13c/
 terminal: Solarized Dark
 mintty: solarized-dark.minttyrc
 tmux: solarized-dark_tmux

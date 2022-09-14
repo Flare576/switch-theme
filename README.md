@@ -1,7 +1,16 @@
 # switch-theme
 
-Tool for switching themes in vim, tmux, zsh, bat, vsCode, terminals (gnome, mintty, Terminal.app),
-and whatever else I figure out.
+Tool for switching themes in
+- vim
+- tmux
+- zsh
+- bat
+- VS Code
+- Azure Data Studio
+- Terminal Emulators
+  - gnome
+  - mintty
+  - Terminal.app
 
 ## Installation
 
@@ -22,9 +31,6 @@ Each sub-folder in this folder represents a _theme_. A theme consists of:
   * \*\_vim
   * \*\_zsh
 * config file
-
-In addition to the core apps, `bat` can also be customized as long as you've loaded the theme to its
-cache!
 
 A theme's folder name must be the same as the `name` attribute in the config.
 

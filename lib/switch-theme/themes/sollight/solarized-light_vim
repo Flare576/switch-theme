@@ -2,4 +2,5 @@ set background=light
 colorscheme solarized
 let g:airline_solarized_dark_text = 1
 let g:airline_solarized_normal_green = 0
-let g:vimade.basebg="#800000"
+let g:vimade.basebg="#ff00ff"
+let g:vimade.basefg="#ff00ff"

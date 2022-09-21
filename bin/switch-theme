@@ -1,5 +1,5 @@
 #!/bin/bash
-version=2.0.0
+version=2.1.0
 usage="$(basename "$0") [h]
 Calling this script will return it's absolute path. The intent is to put an entry like this in your profile:
 
@@ -27,7 +27,7 @@ shift $((OPTIND -1))
 
 SCRIPTPATH="$0"
 INSTALLED="${SCRIPTPATH%/*/*}"
-THEMES="$INSTALLED/lib/themes"
+THEMES="$INSTALLED/lib/switch-theme/themes"
 
 # Most of the work is done when a user wants to change themes
 function st() {
@@ -103,7 +103,7 @@ EOF
       # TODO: should be a way to check if this value is already there...
       defaults write com.apple.Terminal "Startup Window Settings" "$title"    # Set new profile to startup
       defaults write com.apple.Terminal "Default Window Settings" "$title"    # Set new profile to default
-      osascript "$INSTALLED/lib/scripts/themeOpenTerminals.scpt" "$title" # Update active/existing windows
+      osascript "$INSTALLED/lib/switch-theme/themeOpenTerminals.scpt" "$title" # Update active/existing windows
     elif command -v dconf &> /dev/null ; then  # Chromebook
       # copy/paste desired theme over "current" theme (which should be "Flare")
       symId=":6d940353-9091-4d32-b491-95a661527d08/"
@@ -140,13 +140,13 @@ else
   # Executing as a command
   if [ "$do_setup" == "true" ]; then
     # Each terminal emulator setup file should check for itself
-    $INSTALLED/lib/scripts/setupGnomeTheme.sh "$THEMES"
-    $INSTALLED/lib/scripts/setupWSLTheme.sh "$THEMES"
-    $INSTALLED/lib/scripts/setupTerminalAppTheme.sh "$THEMES"
+    $INSTALLED/lib/switch-theme/setupGnomeTheme.sh "$THEMES"
+    $INSTALLED/lib/switch-theme/setupWSLTheme.sh "$THEMES"
+    $INSTALLED/lib/switch-theme/setupTerminalAppTheme.sh "$THEMES"
 
     # Wire up vim plugin for <leader>t
     rm "$HOME/.vim/pack/plugins/start/vim-switch-themes" &> /dev/null
-    ln -sf "$INSTALLED/lib/vim-switch-themes" "$HOME/.vim/pack/plugins/start/vim-switch-themes"
+    ln -sf "$INSTALLED/switch-theme/vim-switch-themes" "$HOME/.vim/pack/plugins/start/vim-switch-themes"
   else
     printf "$SCRIPTPATH"
   fi

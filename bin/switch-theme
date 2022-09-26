@@ -1,5 +1,5 @@
 #!/bin/bash
-version=2.1.0
+version=2.2.0
 usage="$(basename "$0") [h]
 Calling this script will return it's absolute path. The intent is to put an entry like this in your profile:
 
@@ -25,9 +25,9 @@ while getopts ':hsv' option; do
 done
 shift $((OPTIND -1))
 
-SCRIPTPATH="$0"
-INSTALLED="${SCRIPTPATH%/*/*}"
-THEMES="$INSTALLED/lib/switch-theme/themes"
+SCRIPTPATH=$(readlink -f "$0")
+INSTALLED="${SCRIPTPATH%/*}"
+THEMES="$INSTALLED/lib/themes"
 
 # Most of the work is done when a user wants to change themes
 function st() {
@@ -103,7 +103,7 @@ EOF
       # TODO: should be a way to check if this value is already there...
       defaults write com.apple.Terminal "Startup Window Settings" "$title"    # Set new profile to startup
       defaults write com.apple.Terminal "Default Window Settings" "$title"    # Set new profile to default
-      osascript "$INSTALLED/lib/switch-theme/themeOpenTerminals.scpt" "$title" # Update active/existing windows
+      osascript "$INSTALLED/lib/themeOpenTerminals.scpt" "$title" # Update active/existing windows
     elif command -v dconf &> /dev/null ; then  # Chromebook
       # copy/paste desired theme over "current" theme (which should be "Flare")
       symId=":6d940353-9091-4d32-b491-95a661527d08/"
@@ -140,9 +140,9 @@ else
   # Executing as a command
   if [ "$do_setup" == "true" ]; then
     # Each terminal emulator setup file should check for itself
-    $INSTALLED/lib/switch-theme/setupGnomeTheme.sh "$THEMES"
-    $INSTALLED/lib/switch-theme/setupWSLTheme.sh "$THEMES"
-    $INSTALLED/lib/switch-theme/setupTerminalAppTheme.sh "$THEMES"
+    $INSTALLED/lib/setupGnomeTheme.sh "$THEMES"
+    $INSTALLED/lib/setupWSLTheme.sh "$THEMES"
+    $INSTALLED/lib/setupTerminalAppTheme.sh "$THEMES"
 
     # Wire up vim plugin for <leader>t
     rm "$HOME/.vim/pack/plugins/start/vim-switch-themes" &> /dev/null

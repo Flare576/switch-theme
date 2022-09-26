@@ -14,9 +14,17 @@ Tool for switching themes in
 
 ## Installation
 
-switch-theme is a bash script, so putting it anywhere in your $PATH is all you really need to do!
+switch-theme uses secondary files and a shell function, so you'll need to ensure the executable
+(bin/switch-theme) is in your $PATH. If you're using [homebrew](https://brew.sh/), you can run `brew install flare576/scripts/switch-theme`.
 
-You can also do `brew install flare576/scripts/switch-theme`
+You'll also need to add
+
+```
+source "$(switch-theme)"
+```
+
+to your `.zshrc` or `.zshenv` to make the `st` function available, then from your command line you
+can run `st [dark|night]` or `st [light|day]` to switch all your tools to the provided theme.
 
 ## Themes
 

@@ -1,5 +1,5 @@
 #!/bin/bash
-version=2.2.1
+version=2.2.2
 usage="$(basename "$0") [h]
 Calling this script will return it's absolute path. The intent is to put an entry like this in your profile:
 
@@ -146,7 +146,7 @@ else
 
     # Wire up vim plugin for <leader>t
     rm "$HOME/.vim/pack/plugins/start/vim-switch-themes" &> /dev/null
-    ln -sf "$INSTALLED/switch-theme/vim-switch-themes" "$HOME/.vim/pack/plugins/start/vim-switch-themes"
+    ln -sf "$INSTALLED/lib/vim-switch-themes" "$HOME/.vim/pack/plugins/start/vim-switch-themes"
   else
     printf "$SCRIPTPATH"
   fi

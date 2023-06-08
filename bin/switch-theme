@@ -1,29 +1,13 @@
 #!/bin/bash
-version=2.2.2
-usage="$(basename "$0") [h]
+version=2.2.3
+usage="$(basename "$0") [hvs]
 Calling this script will return it's absolute path. The intent is to put an entry like this in your profile:
 
 source \"\$(switch-theme)\"
 
-which will then allow you to call
+which will then allow you to call 'st <theme_alias>' to switch themes.
 
-st <theme_alias>
-
-to switch themes."
-
-while getopts ':hsv' option; do
-  case "$option" in
-    h) echo "$usage"
-      exit
-      ;;
-    s) do_setup="true"
-      ;;
-    v) echo $version
-      exit
-      ;;
-  esac
-done
-shift $((OPTIND -1))
+Run 'switch-theme -s' to setup your terminal emulator after first install."
 
 SCRIPTPATH=$(readlink -f "$0")
 INSTALLED="${SCRIPTPATH%/*}"
@@ -138,6 +122,23 @@ if [ $sourced -eq 1 ]; then
   source "$THEME_CONFIG"
 else
   # Executing as a command
+  while getopts ':hsv' option; do
+    case "$option" in
+      h) echo "$usage"
+        exit
+        ;;
+      s) do_setup="true"
+        ;;
+      v) echo $version
+        exit
+        ;;
+      *) echo "Unknown Option '$OPTARG', exiting"
+        exit
+        ;;
+    esac
+  done
+  shift $((OPTIND -1))
+
   if [ "$do_setup" == "true" ]; then
     # Each terminal emulator setup file should check for itself
     $INSTALLED/lib/setupGnomeTheme.sh "$THEMES"

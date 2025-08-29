@@ -1,5 +1,5 @@
 #!/bin/bash
-version=2.2.3
+version=2.2.4
 usage="$(basename "$0") [hvs]
 Calling this script will return it's absolute path. The intent is to put an entry like this in your profile:
 
@@ -9,7 +9,7 @@ which will then allow you to call 'st <theme_alias>' to switch themes.
 
 Run 'switch-theme -s' to setup your terminal emulator after first install."
 
-SCRIPTPATH=$(readlink -f "$0")
+SCRIPTPATH=$(realpath "$0")
 INSTALLED="${SCRIPTPATH%/*}"
 THEMES="$INSTALLED/lib/themes"
 

@@ -19,7 +19,7 @@ if ! command -v defaults &> /dev/null ; then # OSX
   exit
 fi
 
-for theme in $THEMES/**/*.terminal; do
+find "$THEMES" -type f -name "*.terminal" | while read -r theme; do
   config="$(dirname "$theme")/config.yml"
   [ -e "$config" ] || continue
   themeName=$(st_yaml "$config" "terminal")

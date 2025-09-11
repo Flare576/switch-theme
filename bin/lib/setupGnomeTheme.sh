@@ -7,13 +7,15 @@
 # Preference UI's list, and sets the default key to use "Flare". Flare is set
 # to the last theme loaded
 
+THEMES="$1"
+
 # convenience method
 function st_yaml() {
   line=$(grep $2 $1)
   echo ${line#$2: }
 }
 
-if ! command -v dconf &> /dev/null ; then  # Chromebook
+if [ -n "$CONTAINER_ID" ] || ! command -v dconf &> /dev/null ; then  # Chromebook & not Steam Deck
   exit
 fi
 
@@ -26,8 +28,7 @@ if [[ -n "$existing" ]] ; then
 fi
 
 # Uses globstar
-themeFiles="$HOME/dotfiles/themes"/**/*.gnome
-for theme in $themeFiles; do
+find "$THEMES" -type f -name "*.gnome" | while read -r theme; do
   [ -e "$theme" ] || continue
   config=$(echo $theme | sed 's/\(.*\)\/.*.gnome/\1\/config')
   themeName=$(st_yaml "$config" "name")

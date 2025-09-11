@@ -1,6 +1,9 @@
 name: sollight
 gnome: :6c28978a-af78-434e-a97f-b5c252a080fd/
 terminal: Solarized Light
+konsole: Solarized Light Trans
+kateui: Breeze Light
+katefile: Solarized Light
 mintty: solarized-light.minttyrc
 tmux: solarized-light_tmux
 vim: solarized-light_vim

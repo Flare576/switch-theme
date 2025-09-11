@@ -1,5 +1,5 @@
 #!/bin/bash
-version=2.2.4
+version=2.3.0
 usage="$(basename "$0") [hvs]
 Calling this script will return it's absolute path. The intent is to put an entry like this in your profile:
 
@@ -18,7 +18,7 @@ function st() {
   hasRun="false"
   # Each theme can have a number of "aliases", e.g. "dark", "night", "soldark"
   # Find matching alias (and warn if there's more than one)
-  for config in "$THEMES"/**/config.yml; do
+  find "$THEMES" -type f -name "config.yml" | while read -r config; do
     [ -e "$config" ] || continue
     checkFor=( ",$(st_yaml "$config" "alias")," )
     # padding with commas is a nice trick to guard against partial matches
@@ -48,24 +48,45 @@ EOF
     if command -v cheat &> /dev/null ; then
       cheat_theme="$(st_yaml "$config" "cheat")"
       filename="$HOME/cheat/conf.yml"
-      sed -i "" -e "s/^style:.*/style: $cheat_theme/" "$filename" &> /dev/null
+      sed -i.bkp -Ee "s/^style:.*/style: $cheat_theme/" "$filename" &> /dev/null && rm "${filename}.bkp"
     fi
 
     # VSCode makes it pretty easy, so why not
     if command -v Code &> /dev/null ; then
       code_theme="$(st_yaml "$config" "vscode")"
       filename="$HOME/Library/Application Support/Code/User/settings.json"
-      [ ! -f "$filename" ] && mkdir -p "$(dirname "$filename")" && echo "{\n\t\"workbench.colorTheme\": \"$code_theme\"\n}" > "$filename"
-      sed -i "" -e "s/\"workbench.colorTheme\":.*/\"workbench.colorTheme\": \"$code_theme\"/" "$filename" &> /dev/null
+
+      # Read existing content or provide an empty JSON object if the file doesn't exist.
+      # Then update the 'workbench.colorTheme' using jq and write back atomically.
+      # The '2>/dev/null' suppresses potential error messages from 'cat' if the file is not found initially.
+      ( [ -f "$filename" ] && cat "$filename" 2>/dev/null || echo "{}" ) | \
+        jq --arg theme "$code_theme" '{"workbench.colorTheme": "$theme"}' > "$filename.tmp" && \
+        mv "$filename.tmp" "$filename"
     fi
 
-    # Azure Data Studio makes it pretty easy, so why not
-    if command -v azuredatastudio &> /dev/null ; then
-      ads_theme="$(st_yaml "$config" "azuredatastudio")"
-      filename="$HOME/Library/Application Support/azuredatastudio/User/settings.json"
-      [ ! -f "$filename" ] && mkdir -p $(dirname "$filename") && echo "{\n\t\"workbench.colorTheme\": \"$ads_theme\"\n}" > "$filename"
-      sed -i "" -e "s/\"workbench.colorTheme\":.*/\"workbench.colorTheme\": \"$ads_theme\"/" "$filename" &> /dev/null
+    # OSS Code on Steam Deck makes it pretty easy (lower-case c), so why not
+    if command -v code &> /dev/null ; then
+      code_theme="$(st_yaml "$config" "vscode")"
+      filename="$HOME/.config/Code - OSS/User/settings.json"
+      mkdir -p "$(dirname "$filename")"
+
+      # Read existing content or provide an empty JSON object if the file doesn't exist.
+      # Then update the 'workbench.colorTheme' using jq and write back atomically.
+      # The '2>/dev/null' suppresses potential error messages from 'cat' if the file is not found initially.
+      ( [ -f "$filename" ] && cat "$filename" 2>/dev/null || echo "{}" ) | \
+        jq --arg theme "$code_theme" '{"workbench.colorTheme": "$theme"}' > "$filename.tmp" && \
+        mv "$filename.tmp" "$filename"
     fi
+
+    # Kate on Steam Deck makes it pretty easy so why not
+    if [ -f "$HOME/.config/katerc" ]; then
+      kate_theme="$(st_yaml "$config" "katefile")"
+      kateui_theme="$(st_yaml "$config" "kateui")"
+      filename="$HOME/.config/katerc"
+      sed -i.bkp -Ee "s/^Color Theme=.*/Color Theme=$kate_theme/" "$filename" &> /dev/null && rm "${filename}.bkp"
+      sed -i.bkp -Ee "s/^ColorScheme=.*/ColorScheme=$kateui_theme/" "$filename" &> /dev/null && rm "${filename}.bkp"
+    fi
+
 
     # Terminal emulators for different machines I use
     if command -v mintheme &> /dev/null ; then # WSL
@@ -88,6 +109,26 @@ EOF
       defaults write com.apple.Terminal "Startup Window Settings" "$title"    # Set new profile to startup
       defaults write com.apple.Terminal "Default Window Settings" "$title"    # Set new profile to default
       osascript "$INSTALLED/lib/themeOpenTerminals.scpt" "$title" # Update active/existing windows
+    elif [ -n "$CONTAINER_ID" ]; then
+      # Inside of a distrobox container, probably a steam deck using Konsole outside of the container
+      title="$(st_yaml "$config" "konsole")"
+
+      # Update default
+      conFile="$HOME/.config/konsolerc"
+      sed -i.bkp -Ee "s%DefaultProfile=.*%DefaultProfile=${title}.profile%" "$conFile" && rm "${conFile}.bkp"
+
+      dbeq="distrobox-host-exec qdbus"
+      # https://discuss.kde.org/t/changing-konsole-profile-from-command-line/18018/6
+      for instance in $(eval "$dbeq" | grep "org.kde.konsole"); do
+        baseCmd="$dbeq $instance"
+        for session in $(eval "$baseCmd" | grep "Sessions/"); do
+          curProfile=$(eval "$baseCmd $session org.kde.konsole.Session.profile")
+          # For now, don't touch non-Solarized sessions
+          if echo "$curProfile" | grep -q "Solarized"; then
+            eval "$baseCmd $session org.kde.konsole.Session.setProfile \"$title\""
+          fi
+        done
+      done
     elif command -v dconf &> /dev/null ; then  # Chromebook
       # copy/paste desired theme over "current" theme (which should be "Flare")
       symId=":6d940353-9091-4d32-b491-95a661527d08/"
@@ -144,6 +185,7 @@ else
     $INSTALLED/lib/setupGnomeTheme.sh "$THEMES"
     $INSTALLED/lib/setupWSLTheme.sh "$THEMES"
     $INSTALLED/lib/setupTerminalAppTheme.sh "$THEMES"
+    $INSTALLED/lib/setupKonsoleTheme.sh "$THEMES"
 
     # Wire up vim plugin for <leader>t
     rm "$HOME/.vim/pack/plugins/start/vim-switch-themes" &> /dev/null
